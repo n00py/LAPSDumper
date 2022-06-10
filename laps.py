@@ -23,9 +23,16 @@ def main():
     else:
         s = Server(args.domain, get_info=ALL)
     c = Connection(s, user=args.domain + "\\" + args.username, password=args.password, authentication=NTLM, auto_bind=True)
-    c.search(search_base=base_creator(args.domain), search_filter='(&(objectCategory=computer)(ms-MCS-AdmPwd=*))',attributes=['ms-MCS-AdmPwd','SAMAccountname'])
-    for entry in c.entries:
-        print (str(entry['sAMAccountName']) +":"+ str(entry['ms-Mcs-AdmPwd']))
+    try:
+    	c.search(search_base=base_creator(args.domain), search_filter='(&(objectCategory=computer)(ms-MCS-AdmPwd=*))',attributes=['ms-MCS-AdmPwd','SAMAccountname'])
+    	for entry in c.entries:
+        	print (str(entry['sAMAccountName']) +":"+ str(entry['ms-Mcs-AdmPwd']))
+    except Exception as ex:
+    	if ex.args[0] == "invalid attribute type ms-MCS-AdmPwd":
+    		print("This domain does not have LAPS configured")
+    	else:
+    		print(ex)
 
+    	
 if __name__ == "__main__":
     main()
