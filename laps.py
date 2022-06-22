@@ -2,7 +2,6 @@
 from ldap3 import ALL, Server, Connection, NTLM, extend, SUBTREE
 import argparse
 from datetime import datetime
-from datetime import date
 parser = argparse.ArgumentParser(description='Dump LAPS Passwords')
 parser.add_argument('-u','--username',  help='username for LDAP', required=True)
 parser.add_argument('-p','--password',  help='password for LDAP (or LM:NT hash)',required=True)
@@ -45,7 +44,7 @@ def main():
             print (str(entry['cn']) +" "+ str(entry['ms-Mcs-AdmPwd']))
             if args.output != None:
                 epoch = (int(str(entry['ms-Mcs-AdmPwdExpirationTime']))/10000000) - 11644473600
-                convertedTime = date.fromtimestamp(epoch).strftime("%m-%d-%Y")
+                convertedTime = datetime.fromtimestamp(epoch).strftime("%m-%d-%Y")
                 f = open(filename,'a')
                 f.writelines(str(entry['cn'])+",\""+ str(entry['ms-Mcs-AdmPwd']) + "\"," + convertedTime + "," + str(epoch) + "," + runtime +"\n")
                 f.close()
