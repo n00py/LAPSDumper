@@ -25,7 +25,7 @@ def main():
     print("LAPS Dumper - Running at " + runtime)
     
     args = parser.parse_args()
-    #Check if the user specifies a file output. Note: Args.output literally sets itself to "None".
+    #Check if the user specifies a file output. If so, it creates a new CSV.
     if args.output != None:
         filename = args.output + getTime.strftime("-%m-%d-%Y.csv")
         f = open(filename,'w')
@@ -42,6 +42,7 @@ def main():
     	c.search(search_base=base_creator(args.domain), search_filter='(&(objectCategory=computer)(ms-MCS-AdmPwd=*))',attributes=['ms-MCS-AdmPwd','ms-Mcs-AdmPwdExpirationTime','cn'])
     	for entry in c.entries:
             print (str(entry['cn']) +" "+ str(entry['ms-Mcs-AdmPwd']))
+            #Appends the Machine Name (not Machine Account) + Password + Password Expiration + Epoch (for some reason it wouldn't convert HMS correctly, so I opted for perserving the epoch in logs) + Runtime to the csv.
             if args.output != None:
                 epoch = (int(str(entry['ms-Mcs-AdmPwdExpirationTime']))/10000000) - 11644473600
                 convertedTime = datetime.fromtimestamp(epoch).strftime("%m-%d-%Y")
