@@ -7,6 +7,7 @@ parser.add_argument('-u','--username',  help='username for LDAP', required=True)
 parser.add_argument('-p','--password',  help='password for LDAP (or LM:NT hash)',required=True)
 parser.add_argument('-l','--ldapserver', help='LDAP server (or domain)', required=False)
 parser.add_argument('-d','--domain', help='Domain', required=True)
+parser.add_argument('-c','--computer', help='Target computer', required=False)                                                                                                                                     
 parser.add_argument('-o','--output', help='Output file to CSV', required=False)
 
 
@@ -37,9 +38,13 @@ def main():
         s = Server(args.ldapserver, get_info=ALL)
     else:
         s = Server(args.domain, get_info=ALL)
+    if args.computer:
+        ldap_filter = "(&(objectCategory=computer)(ms-MCS-AdmPwd=*)(cn=" + args.computer + "}))"
+    else:
+        ldap_filter = "(&(objectCategory=computer)(ms-MCS-AdmPwd=*)"
     c = Connection(s, user=args.domain + "\\" + args.username, password=args.password, authentication=NTLM, auto_bind=True)
     try:
-    	c.search(search_base=base_creator(args.domain), search_filter='(&(objectCategory=computer)(ms-MCS-AdmPwd=*))',attributes=['ms-MCS-AdmPwd','ms-Mcs-AdmPwdExpirationTime','cn'])
+    	c.search(search_base=base_creator(args.domain), search_filter=ldap_filter, attributes=['ms-MCS-AdmPwd','ms-Mcs-AdmPwdExpirationTime','cn'])
     	for entry in c.entries:
             print (str(entry['cn']) +" "+ str(entry['ms-Mcs-AdmPwd']))
             #Appends the Machine Name (not Machine Account) + Password + Password Expiration + Epoch (for some reason it wouldn't convert HMS correctly, so I opted for perserving the epoch in logs) + Runtime to the csv.
