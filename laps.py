@@ -39,7 +39,7 @@ def main():
     else:
         s = Server(args.domain, get_info=ALL)
     if args.computer:
-        ldap_filter = "(&(objectCategory=computer)(ms-MCS-AdmPwd=*)(cn=" + args.computer + "}))"
+        ldap_filter = "(&(objectCategory=computer)(ms-MCS-AdmPwd=*)(cn=" + args.computer + "))"
     else:
         ldap_filter = "(&(objectCategory=computer)(ms-MCS-AdmPwd=*))"
     c = Connection(s, user=args.domain + "\\" + args.username, password=args.password, authentication=NTLM, auto_bind=True)
